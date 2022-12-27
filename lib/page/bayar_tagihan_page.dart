@@ -92,6 +92,34 @@ class _BayarTagihanPageState extends State<BayarTagihanPage> {
                   children: [
                     ListTile(
                       title: Text(
+                        "Nama",
+                        style: TextStyle(color: Colors.black26),
+                      ),
+                      subtitle: Text(
+                        "${tagihan!.pelanggan!.namaUsaha}",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 24),
+                      ),
+                    ),
+                    ListTile(
+                      title: Text(
+                        "Alamat",
+                        style: TextStyle(color: Colors.black26),
+                      ),
+                      subtitle: Text(
+                        "${tagihan!.pelanggan!.alamat}",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Card(
+                child: Column(
+                  children: [
+                    ListTile(
+                      title: Text(
                         "Total Tagihan",
                         style: TextStyle(color: Colors.black26),
                       ),

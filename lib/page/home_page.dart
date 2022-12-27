@@ -75,6 +75,19 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  void bukaRute() {
+    var coordinates = "";
+    for (var tagihan in tagihanMingguIni) {
+      coordinates +=
+          "${tagihan.pelanggan?.longitude},${tagihan.pelanggan?.latitude}";
+      if (tagihan != tagihanMingguIni.last) {
+        coordinates += ";";
+      }
+    }
+    print(coordinates);
+    Navigator.pushNamed(context, '/peta-rute', arguments: coordinates);
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -165,7 +178,7 @@ class _HomePageState extends State<HomePage> {
                             borderRadius: BorderRadius.circular(50),
                           ),
                           onTap: () {
-                            print("buka peta");
+                            bukaRute();
                           },
                           child: Container(
                             decoration: BoxDecoration(
@@ -205,10 +218,27 @@ class _HomePageState extends State<HomePage> {
                           var date7String = date7.toString().substring(0, 10);
                           return Card(
                             child: ListTile(
+                              onTap: () {
+                                Navigator.pushNamed(context, "/bayar-tagihan",
+                                        arguments: tagihanMingguIni[index])
+                                    .then((_) {
+                                  setState(() {});
+                                  getStat();
+                                });
+                              },
                               title: Text(
                                   "${tagihanMingguIni[index].pelanggan!.namaUsaha}"),
-                              subtitle: Text(
-                                  'Rp. ${UtilityProvider.formatCurrency("${tagihanMingguIni[index].totalTagihan}")}'),
+                              subtitle: Row(
+                                children: [
+                                  Text(
+                                      '${UtilityProvider.formatCurrency("${tagihanMingguIni[index].totalTagihan}")}'),
+                                  Text("/"),
+                                  Text(
+                                    '${UtilityProvider.formatCurrency("${tagihanMingguIni[index].totalBayar}")}',
+                                    style: TextStyle(color: Colors.red),
+                                  )
+                                ],
+                              ),
                               trailing: Chip(label: Text("${date7String}")),
                             ),
                           );
