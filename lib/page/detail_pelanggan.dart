@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:salesman/model/pelanggan.dart';
 import 'package:salesman/model/tagihan.dart';
 import 'package:salesman/provider/storage_provider.dart';
@@ -16,10 +17,40 @@ class DetailPelangganPage extends StatefulWidget {
 class _DetailPelangganPageState extends State<DetailPelangganPage> {
   Pelanggan? pelanggan;
   List<Tagihan> tagihans = [];
+  DateTime selectedDate = DateTime.now();
+
+  TextEditingController _tanggalTagihanController = TextEditingController();
+  TextEditingController _totalTagihanController = TextEditingController();
+  TextEditingController _keteranganController = TextEditingController();
+
+  @override
+  void setState(fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }
+
+  //datepicker
+  Future<Null> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(2015, 8),
+        lastDate: DateTime(2101));
+    if (picked != null && picked != selectedDate)
+      setState(() {
+        selectedDate = picked;
+        //format date before fill _tanggalTagihanController
+        _tanggalTagihanController.text =
+            DateFormat('dd-MM-yyyy').format(selectedDate);
+      });
+  }
 
   void getDetailPelanggan() async {
+    UtilityProvider.showLoadingDialog(context);
     var token = await StorageProvider.getToken();
     if (token == null) {
+      Navigator.pop(context);
       return;
     } else if (pelanggan != null) {
       await PelangganRepository()
@@ -29,14 +60,14 @@ class _DetailPelangganPageState extends State<DetailPelangganPage> {
           setState(() {
             pelanggan = value.data;
           });
+          getTagihanPelanggan();
         }
       });
-      getTagihanPelanggan();
     }
   }
 
   void getTagihanPelanggan() async {
-    UtilityProvider.showLoadingDialog(context);
+    // UtilityProvider.showLoadingDialog(context);
     var token = await StorageProvider.getToken();
     if (token == null) {
       Navigator.pop(context);
@@ -55,12 +86,102 @@ class _DetailPelangganPageState extends State<DetailPelangganPage> {
     Navigator.pop(context);
   }
 
+  void tambahTagihan() async {
+    UtilityProvider.showLoadingDialog(context);
+    var dataTagihan = new Tagihan(
+        tanggalTagihan: _tanggalTagihanController.text,
+        totalTagihan: int.parse(_totalTagihanController.text),
+        keterangan: _keteranganController.text,
+        pelangganId: pelanggan!.sId!);
+
+    var token = await StorageProvider.getToken();
+    if (token == null) {
+      Navigator.pop(context);
+      return;
+    } else if (pelanggan != null) {
+      await TagihanRepository().createTagihan(token, dataTagihan).then((value) {
+        if (value.status == 200) {
+          Navigator.pop(context);
+          UtilityProvider.showSnackBar("${value.message}", context);
+          getTagihanPelanggan();
+        } else {
+          UtilityProvider.showAlertDialog("Gagal", "${value.message}", context);
+        }
+      });
+    }
+    Navigator.pop(context);
+  }
+
+  //show dialog form add tagihan
+  void showAddTagihanDialog() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Tambah Tagihan"),
+            content: Form(
+              child: SingleChildScrollView(
+                  child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  GestureDetector(
+                    onTap: () async {
+                      await _selectDate(context);
+                    },
+                    child: TextFormField(
+                      onTap: () async {
+                        await _selectDate(context);
+                      },
+                      controller: _tanggalTagihanController,
+                      readOnly: true,
+                      //enabled: false,
+                      decoration: InputDecoration(
+                        labelText: "Tanggal Tagihan",
+                      ),
+                    ),
+                  ),
+                  TextFormField(
+                    keyboardType: TextInputType.number,
+                    controller: _totalTagihanController,
+                    decoration: InputDecoration(
+                      labelText: "Jumlah Tagihan",
+                    ),
+                  ),
+                  TextFormField(
+                    controller: _keteranganController,
+                    decoration: InputDecoration(
+                      labelText: "Keterangan",
+                    ),
+                  ),
+                ],
+              )),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text("Batal"),
+              ),
+              TextButton(
+                onPressed: () {
+                  tambahTagihan();
+                },
+                child: Text("Simpan"),
+              ),
+            ],
+          );
+        });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     Future.delayed(Duration.zero, () {
-      getTagihanPelanggan();
+      _tanggalTagihanController.text =
+          DateFormat('dd-MM-yyyy').format(selectedDate);
+      getDetailPelanggan();
     });
   }
 
@@ -118,8 +239,20 @@ class _DetailPelangganPageState extends State<DetailPelangganPage> {
                               style: TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold),
                             )),
+                        ElevatedButton(
+                            onPressed: () {
+                              showAddTagihanDialog();
+                            },
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.add),
+                                Text("Tambah Tagihan")
+                              ],
+                            )),
                         ListView.builder(
                           shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
                           itemCount: tagihans.length,
                           itemBuilder: (context, index) {
                             //format utc to date Y-m-d
@@ -153,7 +286,6 @@ class _DetailPelangganPageState extends State<DetailPelangganPage> {
                                   subtitle: Text(
                                       "Ket : ${tagihans[index].keterangan}"),
                                 ),
-                                Divider(),
                                 Padding(
                                   padding: EdgeInsets.all(10),
                                   child: Row(
@@ -166,19 +298,28 @@ class _DetailPelangganPageState extends State<DetailPelangganPage> {
                                               tagihans[index].totalTagihan)
                                           ? TextButton(
                                               onPressed: () {
-                                                Navigator.pushNamed(
-                                                    context, "/bayar-tagihan",
-                                                    arguments: tagihans[index]);
+                                                Navigator.pushNamed(context,
+                                                        "/bayar-tagihan",
+                                                        arguments:
+                                                            tagihans[index])
+                                                    .then((_) {
+                                                  setState(() {});
+                                                  UtilityProvider
+                                                      .showLoadingDialog(
+                                                          context);
+                                                  getTagihanPelanggan();
+                                                });
                                               },
                                               child: Text("Bayar"),
                                             )
                                           : Chip(
                                               label: Text("Lunas"),
                                               backgroundColor: Colors.green,
-                                            )
+                                            ),
                                     ],
                                   ),
-                                )
+                                ),
+                                Divider(),
                               ],
                             );
                           },

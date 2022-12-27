@@ -12,7 +12,7 @@ class ApiProvider {
   );
   static final Dio _dio = Dio(_options);
 
-  static const String base_url = 'http://192.168.8.217:3000';
+  static const String base_url = 'http://192.168.1.6:3000';
 
   static Future<Response> get(String url, header) async {
     (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =

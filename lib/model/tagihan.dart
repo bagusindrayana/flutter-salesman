@@ -1,3 +1,5 @@
+import 'package:salesman/model/pelanggan.dart';
+
 class Tagihan {
   String? pelangganId;
   String? tanggalTagihan;
@@ -7,6 +9,7 @@ class Tagihan {
   List<dynamic>? pembayaran;
   String? sId;
   String? waktuDibuat;
+  Pelanggan? pelanggan;
 
   Tagihan(
       {this.pelangganId,
@@ -16,7 +19,8 @@ class Tagihan {
       this.keterangan,
       this.pembayaran,
       this.sId,
-      this.waktuDibuat});
+      this.waktuDibuat,
+      this.pelanggan});
 
   Tagihan.fromJson(Map<String, dynamic> json) {
     pelangganId = json['pelanggan_id'];
@@ -27,6 +31,9 @@ class Tagihan {
     pembayaran = json['pembayaran'];
     sId = json['_id'];
     waktuDibuat = json['waktu_dibuat'];
+    pelanggan = json['pelanggan'] != null
+        ? new Pelanggan.fromJson(json['pelanggan'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -39,6 +46,9 @@ class Tagihan {
     data['pembayaran'] = this.pembayaran;
     data['_id'] = this.sId;
     data['waktu_dibuat'] = this.waktuDibuat;
+    if (this.pelanggan != null) {
+      data['pelanggan'] = this.pelanggan!.toJson();
+    }
     return data;
   }
 }

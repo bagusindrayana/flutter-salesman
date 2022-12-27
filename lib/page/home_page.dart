@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:salesman/model/tagihan.dart';
 import 'package:salesman/provider/storage_provider.dart';
 import 'package:salesman/provider/utility_provider.dart';
 import 'package:salesman/repository/stat_repository.dart';
+import 'package:salesman/repository/tagihan_repository.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,8 +13,17 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int? total_tagihan;
-  int? total_pelanggan;
+  int? total_tagihan = null;
+  int? total_pelanggan = null;
+  bool loadingTagihan = true;
+  List<Tagihan> tagihanMingguIni = [];
+
+  @override
+  void setState(fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }
 
   void getStat() async {
     var token = await StorageProvider.getToken();
@@ -34,6 +45,34 @@ class _HomePageState extends State<HomePage> {
       }
     });
     Navigator.pop(context);
+    getTagihanMingguIni();
+  }
+
+  void getTagihanMingguIni() async {
+    setState(() {
+      loadingTagihan = true;
+    });
+    var token = await StorageProvider.getToken();
+    if (token == null) {
+      Navigator.pushReplacementNamed(context, '/login');
+      return;
+    }
+    setState(() {
+      loadingTagihan = true;
+    });
+    await TagihanRepository().tagihanMingguIni(token).then((value) {
+      print(value.data);
+      if (value.status == 200) {
+        setState(() {
+          tagihanMingguIni = value.data!;
+        });
+      } else {
+        UtilityProvider.showSnackBar(value.message!, context);
+      }
+    });
+    setState(() {
+      loadingTagihan = false;
+    });
   }
 
   @override
@@ -57,53 +96,123 @@ class _HomePageState extends State<HomePage> {
           },
           child: Padding(
             padding: EdgeInsets.all(16),
-            child: GridView.count(
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              crossAxisCount: 2,
+            child: ListView(
               children: [
-                Card(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Icon(Icons.bar_chart, size: 50),
-                      ListTile(
-                        title: Text(
-                          "${(total_tagihan == null) ? 'loading...' : total_tagihan}",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontSize: 26, fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Text(
-                          'Tagihan yang belum dibayar',
-                          textAlign: TextAlign.center,
-                        ),
+                GridView.count(
+                  shrinkWrap: true,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  crossAxisCount: 2,
+                  physics: NeverScrollableScrollPhysics(),
+                  children: [
+                    Card(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Icon(Icons.bar_chart, size: 50),
+                          ListTile(
+                            title: Text(
+                              "${(total_tagihan == null) ? 'loading...' : UtilityProvider.formatCurrency("${total_tagihan}")}",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Text(
+                              'Tagihan yang belum dibayar',
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
                       ),
+                    ),
+                    Card(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Icon(Icons.people, size: 50),
+                          ListTile(
+                            title: Text(
+                              "${(total_pelanggan == null) ? 'loading...' : total_pelanggan}",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontSize: 26, fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Text(
+                              'Total Pelanggan',
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+                SizedBox(height: 20),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Tagihan Lewat 7 Hari',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      InkWell(
+                          customBorder: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                          onTap: () {
+                            print("buka peta");
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.blue,
+                                borderRadius: BorderRadius.circular(50)),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 8),
+                            child: Text(
+                              "Buka Rute",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ))
                     ],
                   ),
                 ),
-                Card(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Icon(Icons.people, size: 50),
-                      ListTile(
-                        title: Text(
-                          "${(total_pelanggan == null) ? 'loding...' : total_pelanggan}",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontSize: 26, fontWeight: FontWeight.bold),
+                SizedBox(height: 10),
+                (loadingTagihan)
+                    ? Center(
+                        child: SizedBox(
+                          height: 50,
+                          width: 50,
+                          child: CircularProgressIndicator(),
                         ),
-                        subtitle: Text(
-                          'Total Pelanggan',
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
+                      )
+                    : ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: tagihanMingguIni.length,
+                        itemBuilder: (context, index) {
+                          var tanggalTagihan =
+                              tagihanMingguIni[index].tanggalTagihan;
+                          //format string to date
+                          var date = DateTime.parse(tanggalTagihan!);
+                          //add 7 days to date
+                          var date7 = date.add(Duration(days: 7));
+                          //get YYYY-MM-DD
+                          var date7String = date7.toString().substring(0, 10);
+                          return Card(
+                            child: ListTile(
+                              title: Text(
+                                  "${tagihanMingguIni[index].pelanggan!.namaUsaha}"),
+                              subtitle: Text(
+                                  'Rp. ${UtilityProvider.formatCurrency("${tagihanMingguIni[index].totalTagihan}")}'),
+                              trailing: Chip(label: Text("${date7String}")),
+                            ),
+                          );
+                        })
               ],
             ),
           )),

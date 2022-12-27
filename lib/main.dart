@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:salesman/page/bayar_tagihan_page.dart';
 import 'package:salesman/page/detail_pelanggan.dart';
 import 'package:salesman/page/home_page.dart';
 import 'package:salesman/page/login_page.dart';
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
           '/detail-pelanggan': (context) => const DetailPelangganPage(),
           '/pilih-lokasi': (context) => const PilihaLokasiPage(),
           '/tambah-pelanggan': (context) => const TambahPelangganPage(),
+          '/bayar-tagihan': (context) => const BayarTagihanPage(),
         });
   }
 }

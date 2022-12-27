@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:salesman/model/pelanggan.dart';
 import 'package:salesman/provider/storage_provider.dart';
+import 'package:salesman/provider/utility_provider.dart';
 import 'package:salesman/repository/pelanggan_repository.dart';
 
 class PelangganPage extends StatefulWidget {
@@ -12,10 +13,21 @@ class PelangganPage extends StatefulWidget {
 
 class _PelangganPageState extends State<PelangganPage> {
   List<Pelanggan> listPelanggan = [];
+
+  @override
+  void setState(fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }
+
   void getPelanggan() async {
+    UtilityProvider.showLoadingDialog(context);
     var token = await StorageProvider.getToken();
     if (token == null) {
+      Navigator.pop(context);
       Navigator.pushReplacementNamed(context, '/login');
+      return;
     } else {
       await PelangganRepository().getAllPelanggan(token).then((res) {
         if (res.status == 200) {
@@ -30,6 +42,7 @@ class _PelangganPageState extends State<PelangganPage> {
           ));
         }
       });
+      Navigator.pop(context);
     }
   }
 
@@ -37,7 +50,9 @@ class _PelangganPageState extends State<PelangganPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    getPelanggan();
+    Future.delayed(Duration.zero, () {
+      getPelanggan();
+    });
   }
 
   @override
