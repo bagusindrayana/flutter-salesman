@@ -195,6 +195,18 @@ class _DetailPelangganPageState extends State<DetailPelangganPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Detail Pelanggan"),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.pushNamed(context, "/ubah-pelanggan",
+                      arguments: pelanggan)
+                  .then((value) {
+                getDetailPelanggan();
+              });
+            },
+            icon: Icon(Icons.edit),
+          )
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: (() async {

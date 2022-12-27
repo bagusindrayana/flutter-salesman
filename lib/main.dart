@@ -5,6 +5,7 @@ import 'package:salesman/page/login_page.dart';
 import 'package:salesman/page/pelanggan/detail_pelanggan.dart';
 import 'package:salesman/page/pelanggan/pelanggan_page.dart';
 import 'package:salesman/page/pelanggan/tambah_pelanggan_page.dart';
+import 'package:salesman/page/pelanggan/ubah_pelanggan_page.dart';
 import 'package:salesman/page/peta_rute_page.dart';
 import 'package:salesman/page/pilih_lokasi_page.dart';
 import 'package:salesman/page/splase_screen_page.dart';
@@ -32,6 +33,7 @@ class MyApp extends StatelessWidget {
           '/detail-pelanggan': (context) => const DetailPelangganPage(),
           '/pilih-lokasi': (context) => const PilihaLokasiPage(),
           '/tambah-pelanggan': (context) => const TambahPelangganPage(),
+          '/ubah-pelanggan': (context) => const UbahPelangganPage(),
           '/bayar-tagihan': (context) => const BayarTagihanPage(),
           '/peta-rute': (context) => const PetaRutePage(),
         });

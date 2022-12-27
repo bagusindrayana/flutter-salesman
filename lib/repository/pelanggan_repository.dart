@@ -110,6 +110,39 @@ class PelangganRepository {
     }
   }
 
+  //update pelanggan
+  Future<PelangganResponse> updatePelanggan(
+      String token, Pelanggan pelanggan) async {
+    try {
+      var url = "/pelanggan/${pelanggan.sId}}";
+      var data = pelanggan.toJson();
+
+      var response =
+          await ApiProvider.post(url, data, {"Authorization": "Bearer $token"});
+      print("ubah");
+      print(response.statusCode);
+      if (response.statusCode == 200) {
+        var d = PelangganResponse.fromJson(response.data);
+        d.status = response.statusCode;
+        return d;
+      } else {
+        return PelangganResponse(status: 500, message: "Gagal mengubah data");
+      }
+    } catch (e, t) {
+      if (e is DioError && e.response != null) {
+        print(e.response!.data);
+        return PelangganResponse(
+            status: e.response!.statusCode,
+            message: "Gagal mengubah data. ${e.message}");
+      } else {
+        print(e);
+        print(t);
+        return PelangganResponse(
+            status: 500, message: "Gagal mengubah data. ${e}");
+      }
+    }
+  }
+
   Future<PelangganResponse> detailPelanggan(
       String token, String pelanggan_id) async {
     try {
