@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:salesman/model/pelanggan.dart';
 import 'package:salesman/model/tagihan.dart';
 import 'package:salesman/provider/storage_provider.dart';
 import 'package:salesman/provider/utility_provider.dart';
+import 'package:salesman/repository/pelanggan_repository.dart';
 import 'package:salesman/repository/stat_repository.dart';
 import 'package:salesman/repository/tagihan_repository.dart';
 
@@ -16,7 +18,7 @@ class _HomePageState extends State<HomePage> {
   int? total_tagihan = null;
   int? total_pelanggan = null;
   bool loadingTagihan = true;
-  List<Tagihan> tagihanMingguIni = [];
+  List<dynamic> tagihanMingguIni = [];
 
   @override
   void setState(fn) {
@@ -60,7 +62,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       loadingTagihan = true;
     });
-    await TagihanRepository().tagihanMingguIni(token).then((value) {
+    await PelangganRepository().tagihanPelangganMingguIni(token).then((value) {
       print(value.data);
       if (value.status == 200) {
         setState(() {
@@ -77,15 +79,18 @@ class _HomePageState extends State<HomePage> {
 
   void bukaRute() {
     var coordinates = "";
-    for (var tagihan in tagihanMingguIni) {
-      coordinates +=
-          "${tagihan.pelanggan?.longitude},${tagihan.pelanggan?.latitude}";
-      if (tagihan != tagihanMingguIni.last) {
+    if (tagihanMingguIni.length <= 0) {
+      UtilityProvider.showSnackBar("Tidak ada data tagihan", context);
+      return;
+    }
+    for (var pelanggan in tagihanMingguIni) {
+      coordinates += "${pelanggan['longitude']},${pelanggan['latitude']}";
+      if (pelanggan != tagihanMingguIni.last) {
         coordinates += ";";
       }
     }
-    print(coordinates);
-    Navigator.pushNamed(context, '/peta-rute', arguments: coordinates);
+
+    Navigator.pushNamed(context, '/peta-rute', arguments: tagihanMingguIni);
   }
 
   @override
@@ -208,8 +213,8 @@ class _HomePageState extends State<HomePage> {
                         physics: NeverScrollableScrollPhysics(),
                         itemCount: tagihanMingguIni.length,
                         itemBuilder: (context, index) {
-                          var tanggalTagihan =
-                              tagihanMingguIni[index].tanggalTagihan;
+                          var tanggalTagihan = tagihanMingguIni[index]
+                              ['tagihan_terbaru']['tanggal_tagihan'];
                           //format string to date
                           var date = DateTime.parse(tanggalTagihan!);
                           //add 7 days to date
@@ -219,27 +224,45 @@ class _HomePageState extends State<HomePage> {
                           return Card(
                             child: ListTile(
                               onTap: () {
-                                Navigator.pushNamed(context, "/bayar-tagihan",
-                                        arguments: tagihanMingguIni[index])
+                                Navigator.pushNamed(
+                                        context, "/tambah-pembayaran",
+                                        arguments: Pelanggan.fromJson(
+                                            tagihanMingguIni[index]))
                                     .then((_) {
                                   setState(() {});
                                   getStat();
                                 });
                               },
                               title: Text(
-                                  "${tagihanMingguIni[index].pelanggan!.namaUsaha}"),
+                                  "${tagihanMingguIni[index]['nama_usaha']}"),
                               subtitle: Row(
                                 children: [
                                   Text(
-                                      '${UtilityProvider.formatCurrency("${tagihanMingguIni[index].totalTagihan}")}'),
+                                      '${UtilityProvider.formatCurrency("${tagihanMingguIni[index]['total_tagihan']}")}'),
                                   Text("/"),
                                   Text(
-                                    '${UtilityProvider.formatCurrency("${tagihanMingguIni[index].totalBayar}")}',
+                                    '${UtilityProvider.formatCurrency("${tagihanMingguIni[index]['total_bayar']}")}',
                                     style: TextStyle(color: Colors.red),
                                   )
                                 ],
                               ),
-                              trailing: Chip(label: Text("${date7String}")),
+                              trailing: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                      "${DateTime.parse(tanggalTagihan!).toString().substring(0, 10)}"),
+                                  Container(
+                                    height: 2,
+                                    width: 70,
+                                    color: Colors.black26,
+                                  ),
+                                  Text(
+                                    "${date7String}",
+                                    style: TextStyle(color: Colors.red),
+                                  )
+                                ],
+                              ),
                             ),
                           );
                         })
@@ -269,8 +292,7 @@ class _HomePageState extends State<HomePage> {
             ListTile(
               title: const Text('Tagihan'),
               onTap: () {
-                // Update the state of the app.
-                // ...
+                Navigator.pushNamed(context, '/tagihan');
               },
             ),
           ],

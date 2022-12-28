@@ -136,11 +136,10 @@ class _UbahPelangganPageState extends State<UbahPelangganPage> {
           Navigator.pop(context);
           Navigator.pop(context);
           UtilityProvider.showAlertDialog(
-              "Berhasil", "Data Pelanggan Berhasil Di Buat", context);
+              "Berhasil", "Data Pelanggan Berhasil Di Ubah", context);
         } else {
           Navigator.pop(context);
-          UtilityProvider.showAlertDialog(
-              "Gagal", "Data Pelanggan Gagal Di Buat", context);
+          UtilityProvider.showAlertDialog("Gagal", "${value.message}", context);
         }
       });
     }

@@ -62,21 +62,28 @@ class _PelangganPageState extends State<PelangganPage> {
           title: Text("Data Pelanggan"),
         ),
         body: RefreshIndicator(
-            child: ListView.builder(
-              itemCount: listPelanggan.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  child: ListTile(
-                    title: Text(listPelanggan[index].namaUsaha!),
-                    subtitle: Text(listPelanggan[index].alamat!),
-                    onTap: () {
-                      Navigator.pushNamed(context, '/detail-pelanggan',
-                          arguments: listPelanggan[index]);
+            child: (listPelanggan.length > 0)
+                ? ListView.builder(
+                    itemCount: listPelanggan.length,
+                    itemBuilder: (context, index) {
+                      return Card(
+                        child: ListTile(
+                          title: Text(listPelanggan[index].namaUsaha!),
+                          subtitle: Text(listPelanggan[index].alamat!),
+                          onTap: () {
+                            Navigator.pushNamed(context, '/detail-pelanggan',
+                                arguments: listPelanggan[index]);
+                          },
+                        ),
+                      );
                     },
+                  )
+                : Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text("Tidak ada data"),
+                    ),
                   ),
-                );
-              },
-            ),
             onRefresh: () async {
               getPelanggan();
             }),

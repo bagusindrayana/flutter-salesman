@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:salesman/model/pelanggan.dart';
+import 'package:salesman/model/pembayaran.dart';
 import 'package:salesman/model/tagihan.dart';
 import 'package:salesman/provider/storage_provider.dart';
 import 'package:salesman/provider/utility_provider.dart';
@@ -17,6 +18,8 @@ class DetailPelangganPage extends StatefulWidget {
 class _DetailPelangganPageState extends State<DetailPelangganPage> {
   Pelanggan? pelanggan;
   List<Tagihan> tagihans = [];
+  List<Pembayaran> pembayarans = [];
+  bool loadPemabayaran = false;
   DateTime selectedDate = DateTime.now();
 
   TextEditingController _tanggalTagihanController = TextEditingController();
@@ -83,7 +86,36 @@ class _DetailPelangganPageState extends State<DetailPelangganPage> {
         }
       });
     }
+    getRiwayatPembayaran();
     Navigator.pop(context);
+  }
+
+  void getRiwayatPembayaran() async {
+    setState(() {
+      loadPemabayaran = true;
+    });
+    var token = await StorageProvider.getToken();
+    if (token == null) {
+      Navigator.pop(context);
+      return;
+    } else if (pelanggan != null) {
+      await PelangganRepository()
+          .riwayatPembayaran(token, pelanggan!.sId!)
+          .then((value) {
+        if (value.status == 200) {
+          setState(() {
+            for (var i = 0; i < value.data!.length; i++) {
+              var d = value.data![i];
+              print(d);
+              pembayarans.add(Pembayaran.fromJson(d));
+            }
+          });
+        }
+      });
+    }
+    setState(() {
+      loadPemabayaran = false;
+    });
   }
 
   void tambahTagihan() async {
@@ -178,7 +210,8 @@ class _DetailPelangganPageState extends State<DetailPelangganPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    Future.delayed(Duration.zero, () {
+
+    Future.delayed(const Duration(microseconds: 500), () {
       _tanggalTagihanController.text =
           DateFormat('dd-MM-yyyy').format(selectedDate);
       getDetailPelanggan();
@@ -244,6 +277,47 @@ class _DetailPelangganPageState extends State<DetailPelangganPage> {
                     ),
                     Card(
                       child: Column(children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
+                                  onPressed: () {
+                                    showAddTagihanDialog();
+                                  },
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.add),
+                                      Text("Tambah Tagihan")
+                                    ],
+                                  )),
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Expanded(
+                              child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      primary: Colors.green),
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                            context, "/tambah-pembayaran",
+                                            arguments: pelanggan)
+                                        .then((_) {
+                                      setState(() {});
+                                      getDetailPelanggan();
+                                    });
+                                  },
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.attach_money),
+                                      Text("Bayar Tagihan")
+                                    ],
+                                  )),
+                            )
+                          ],
+                        ),
                         Padding(
                             padding: EdgeInsets.all(10),
                             child: Text(
@@ -251,15 +325,25 @@ class _DetailPelangganPageState extends State<DetailPelangganPage> {
                               style: TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold),
                             )),
-                        ElevatedButton(
-                            onPressed: () {
-                              showAddTagihanDialog();
-                            },
+                        Padding(
+                            padding: EdgeInsets.all(10),
                             child: Row(
-                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.add),
-                                Text("Tambah Tagihan")
+                                Text(
+                                  "${UtilityProvider.formatCurrency(pelanggan!.totalTagihan.toString())}",
+                                  style: TextStyle(fontSize: 20),
+                                ),
+                                Text(" / "),
+                                Text(
+                                    "${UtilityProvider.formatCurrency(pelanggan!.totalBayar.toString())}",
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        color: (pelanggan!.totalBayar == null ||
+                                                (pelanggan!.totalBayar <
+                                                    pelanggan!.totalTagihan))
+                                            ? Colors.red
+                                            : Colors.green)),
                               ],
                             )),
                         ListView.builder(
@@ -298,44 +382,92 @@ class _DetailPelangganPageState extends State<DetailPelangganPage> {
                                   subtitle: Text(
                                       "Ket : ${tagihans[index].keterangan}"),
                                 ),
-                                Padding(
-                                  padding: EdgeInsets.all(10),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                          "Bayar : ${UtilityProvider.formatCurrency(tagihans[index].totalBayar.toString())}"),
-                                      (tagihans[index].totalBayar !=
-                                              tagihans[index].totalTagihan)
-                                          ? TextButton(
-                                              onPressed: () {
-                                                Navigator.pushNamed(context,
-                                                        "/bayar-tagihan",
-                                                        arguments:
-                                                            tagihans[index])
-                                                    .then((_) {
-                                                  setState(() {});
-                                                  UtilityProvider
-                                                      .showLoadingDialog(
-                                                          context);
-                                                  getTagihanPelanggan();
-                                                });
-                                              },
-                                              child: Text("Bayar"),
-                                            )
-                                          : Chip(
-                                              label: Text("Lunas"),
-                                              backgroundColor: Colors.green,
-                                            ),
-                                    ],
-                                  ),
-                                ),
+                                // Padding(
+                                //   padding: EdgeInsets.all(10),
+                                //   child: Row(
+                                //     mainAxisAlignment:
+                                //         MainAxisAlignment.spaceBetween,
+                                //     children: [
+                                //       Text(
+                                //           "Bayar : ${UtilityProvider.formatCurrency(tagihans[index].totalBayar.toString())}"),
+                                //       (tagihans[index].totalBayar !=
+                                //               tagihans[index].totalTagihan)
+                                //           ? Chip(
+                                //               label: Text("Belum Lunas"),
+                                //               backgroundColor: Colors.red,
+                                //             )
+                                //           : Chip(
+                                //               label: Text("Lunas"),
+                                //               backgroundColor: Colors.green,
+                                //             ),
+                                //     ],
+                                //   ),
+                                // ),
                                 Divider(),
                               ],
                             );
                           },
                         )
+                      ]),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Card(
+                      child: Column(children: [
+                        Padding(
+                            padding: EdgeInsets.all(10),
+                            child: Text(
+                              "Riwayat Pembayaran",
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            )),
+                        (loadPemabayaran)
+                            ? CircularProgressIndicator()
+                            : ListView.builder(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: pembayarans.length,
+                                itemBuilder: (context, index) {
+                                  //format utc to date Y-m-d
+                                  var utc = pembayarans[index].tanggalBayar;
+                                  var date = DateTime.parse(utc!);
+                                  var formattedDate =
+                                      "${date.day}-${date.month}-${date.year}";
+
+                                  //format price to currency
+                                  var price = pembayarans[index].totalBayar;
+
+                                  var priceFormat =
+                                      UtilityProvider.formatCurrency(
+                                          price.toString());
+
+                                  return Column(
+                                    children: [
+                                      ListTile(
+                                        title: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Text("${priceFormat}",
+                                                style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                            Chip(
+                                                label: Text("${formattedDate}"))
+                                          ],
+                                        ),
+                                        subtitle: Text(
+                                            "Ket : ${pembayarans[index].keterangan}"),
+                                      ),
+                                      Divider(),
+                                    ],
+                                  );
+                                },
+                              )
                       ]),
                     )
                   ],
