@@ -12,4 +12,9 @@ class StorageProvider {
     final storage = new FlutterSecureStorage();
     return await storage.read(key: 'token');
   }
+
+  static Future<void> clearToken() async {
+    final storage = new FlutterSecureStorage();
+    return await storage.deleteAll();
+  }
 }

@@ -137,11 +137,13 @@ class _DetailPelangganPageState extends State<DetailPelangganPage> {
           UtilityProvider.showSnackBar("${value.message}", context);
           getTagihanPelanggan();
         } else {
+          Navigator.pop(context);
           UtilityProvider.showAlertDialog("Gagal", "${value.message}", context);
         }
       });
+    } else {
+      Navigator.pop(context);
     }
-    Navigator.pop(context);
   }
 
   //show dialog form add tagihan
@@ -366,6 +368,12 @@ class _DetailPelangganPageState extends State<DetailPelangganPage> {
                             return Column(
                               children: [
                                 ListTile(
+                                  onTap: (() {
+                                    Navigator.pushNamed(
+                                            context, "/detail-tagihan",
+                                            arguments: tagihans[index])
+                                        .then((value) => setState(() {}));
+                                  }),
                                   title: Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,

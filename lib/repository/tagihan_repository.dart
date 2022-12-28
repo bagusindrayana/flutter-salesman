@@ -162,6 +162,38 @@ class TagihanRepository {
     }
   }
 
+  //update tagihan
+  Future<TagihanResponse> updateTagihan(
+      String token, String tagihan_id, Tagihan tagihan) async {
+    try {
+      var url = "/tagihan/${tagihan_id}";
+      var data = tagihan.toJson();
+
+      var response =
+          await ApiProvider.post(url, data, {"Authorization": "Bearer $token"});
+
+      if (response.statusCode == 200) {
+        var d = TagihanResponse.fromJson(response.data);
+        d.status = response.statusCode;
+        return d;
+      } else {
+        return TagihanResponse(status: 500, message: "Gagal mngubah data");
+      }
+    } catch (e, t) {
+      if (e is DioError && e.response != null) {
+        print(e.response!.data);
+        return TagihanResponse(
+            status: e.response!.statusCode,
+            message: "Gagal mngubah data. ${e.message}");
+      } else {
+        print(e);
+        print(t);
+        return TagihanResponse(
+            status: 500, message: "Gagal menambah data. ${e}");
+      }
+    }
+  }
+
   Future<TagihanResponse> bayarTagihan(String token, String tagihan_id,
       String total_bayar, String tanggal_bayar, String keterangan) async {
     try {

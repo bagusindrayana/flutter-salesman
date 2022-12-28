@@ -87,17 +87,18 @@ class AuthRepository {
 
       if (response.statusCode == 200) {
         final storage = new FlutterSecureStorage();
-        await persistToken(response.data['token']);
+        await persistToken(response.data['data']['token']);
         return LoginResponse(
             status: 200,
             message: "Login berhasil",
-            token: response.data['token']);
+            token: response.data['data']['token']);
       }
 
       return LoginResponse(status: 402, message: response.data);
     } catch (e) {
       if (e is DioError) {
         var response = e.response;
+        print(response);
         if (response == null) {
           return LoginResponse(message: "Error : ${e}");
         } else if (response.data != null) {

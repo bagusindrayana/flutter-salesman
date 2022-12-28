@@ -10,6 +10,7 @@ class Tagihan {
   String? sId;
   String? waktuDibuat;
   Pelanggan? pelanggan;
+  bool? cash;
 
   Tagihan(
       {this.pelangganId,
@@ -20,7 +21,8 @@ class Tagihan {
       this.pembayaran,
       this.sId,
       this.waktuDibuat,
-      this.pelanggan});
+      this.pelanggan,
+      this.cash});
 
   Tagihan.fromJson(Map<String, dynamic> json) {
     pelangganId = json['pelanggan_id'];
@@ -34,6 +36,7 @@ class Tagihan {
     pelanggan = json['pelanggan'] != null
         ? new Pelanggan.fromJson(json['pelanggan'])
         : null;
+    cash = json['cash'] ?? false;
   }
 
   Map<String, dynamic> toJson() {
@@ -49,6 +52,7 @@ class Tagihan {
     if (this.pelanggan != null) {
       data['pelanggan'] = this.pelanggan!.toJson();
     }
+    data['cash'] = this.cash;
     return data;
   }
 }

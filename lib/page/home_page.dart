@@ -93,6 +93,11 @@ class _HomePageState extends State<HomePage> {
     Navigator.pushNamed(context, '/peta-rute', arguments: tagihanMingguIni);
   }
 
+  void logout() async {
+    await StorageProvider.clearToken();
+    Navigator.pushReplacementNamed(context, '/login');
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -124,45 +129,55 @@ class _HomePageState extends State<HomePage> {
                   physics: NeverScrollableScrollPhysics(),
                   children: [
                     Card(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Icon(Icons.bar_chart, size: 50),
-                          ListTile(
-                            title: Text(
-                              "${(total_tagihan == null) ? 'loading...' : UtilityProvider.formatCurrency("${total_tagihan}")}",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
+                      child: InkWell(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Icon(Icons.bar_chart, size: 50),
+                            ListTile(
+                              title: Text(
+                                "${(total_tagihan == null) ? 'loading...' : UtilityProvider.formatCurrency("${total_tagihan}")}",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold),
+                              ),
+                              subtitle: Text(
+                                'Tagihan yang belum dibayar',
+                                textAlign: TextAlign.center,
+                              ),
                             ),
-                            subtitle: Text(
-                              'Tagihan yang belum dibayar',
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
+                        onTap: () {
+                          Navigator.pushNamed(context, '/tagihan');
+                        },
                       ),
                     ),
                     Card(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Icon(Icons.people, size: 50),
-                          ListTile(
-                            title: Text(
-                              "${(total_pelanggan == null) ? 'loading...' : total_pelanggan}",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontSize: 26, fontWeight: FontWeight.bold),
+                      child: InkWell(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Icon(Icons.people, size: 50),
+                            ListTile(
+                              title: Text(
+                                "${(total_pelanggan == null) ? 'loading...' : total_pelanggan}",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: 26, fontWeight: FontWeight.bold),
+                              ),
+                              subtitle: Text(
+                                'Total Pelanggan',
+                                textAlign: TextAlign.center,
+                              ),
                             ),
-                            subtitle: Text(
-                              'Total Pelanggan',
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
+                        onTap: () {
+                          Navigator.pushNamed(context, '/pelanggan');
+                        },
                       ),
                     )
                   ],
@@ -174,7 +189,7 @@ class _HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Tagihan Lewat 7 Hari',
+                        'Tagihan Lewat 6 Hari',
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
@@ -284,15 +299,44 @@ class _HomePageState extends State<HomePage> {
               child: Text('Welcome'),
             ),
             ListTile(
+              leading: Icon(Icons.people),
               title: const Text('Pelanggan'),
               onTap: () {
                 Navigator.pushNamed(context, '/pelanggan');
               },
             ),
             ListTile(
+              leading: Icon(Icons.file_open),
               title: const Text('Tagihan'),
               onTap: () {
                 Navigator.pushNamed(context, '/tagihan');
+              },
+            ),
+            //logout
+            ListTile(
+              leading: Icon(Icons.logout),
+              title: const Text('Logout'),
+              onTap: () {
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Text('Logout'),
+                        content: Text('Apakah anda yakin ingin logout?'),
+                        actions: [
+                          TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text('Tidak')),
+                          TextButton(
+                              onPressed: () {
+                                logout();
+                              },
+                              child: Text('Ya'))
+                        ],
+                      );
+                    });
               },
             ),
           ],

@@ -97,14 +97,20 @@ class PelangganRepository {
   }
 
   //create pelanggan
-  Future<PelangganResponse> createPelanggan(String token, Pelanggan pelanggan,
-      String tanggal_tagihan, String total_tagihan, String keterangan) async {
+  Future<PelangganResponse> createPelanggan(
+      String token,
+      Pelanggan pelanggan,
+      String tanggal_tagihan,
+      String total_tagihan,
+      String keterangan,
+      bool uangCash) async {
     try {
       var url = "/pelanggan";
       var data = pelanggan.toJson();
       data['tanggal_tagihan'] = tanggal_tagihan;
       data['total_tagihan'] = total_tagihan;
       data['keterangan'] = keterangan;
+      data['cash'] = uangCash;
       var response =
           await ApiProvider.post(url, data, {"Authorization": "Bearer $token"});
       print("tambah");

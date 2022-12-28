@@ -82,30 +82,31 @@ class _PetaRutePageState extends State<PetaRutePage> {
       await Dio().get(url).then((value) {
         var valJson = value.data;
         PolylinePoints polylinePoints = PolylinePoints();
-        setState(() {
-          for (var i = 0; i < valJson['waypoints'].length; i++) {
-            if (i > 0) {
-              var wp = valJson['waypoints'][i];
-              markers
-                  .addLabelMarker(LabelMarker(
-                    onTap: () {
-                      setState(() {
-                        namaToko =
-                            "${listTempat[i - 1]['nama_usaha']} / ${listTempat[i - 1]['no_telp']}";
-                        address = listTempat[i - 1]['alamat'];
-                      });
-                    },
-                    label: "${i}",
-                    markerId: MarkerId("trip-$i"),
-                    position: LatLng(wp['location'][1], wp['location'][0]),
-                    backgroundColor: Colors.green,
-                  ))
-                  .then((value) {});
-            }
+        for (var i = 0; i < valJson['waypoints'].length; i++) {
+          if (i > 0) {
+            var wp = valJson['waypoints'][i];
+            markers
+                .addLabelMarker(LabelMarker(
+              onTap: () {
+                setState(() {
+                  namaToko =
+                      "${listTempat[i - 1]['nama_usaha']} / ${listTempat[i - 1]['no_telp']}";
+                  address = listTempat[i - 1]['alamat'];
+                });
+              },
+              label: "${i}",
+              markerId: MarkerId("trip-$i"),
+              position: LatLng(wp['location'][1], wp['location'][0]),
+              backgroundColor: Colors.green,
+            ))
+                .then((value) {
+              setState(() {
+                result = polylinePoints
+                    .decodePolyline(valJson['trips'][0]['geometry']);
+              });
+            });
           }
-          result =
-              polylinePoints.decodePolyline(valJson['trips'][0]['geometry']);
-        });
+        }
       });
     } catch (e) {
       if (e is DioError) {

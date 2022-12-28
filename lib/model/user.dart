@@ -3,6 +3,7 @@ class User {
   String? username;
   String? password;
   String? token;
+  String? level;
 
   User({this.sId, this.username, this.password, this.token});
 
@@ -11,6 +12,7 @@ class User {
     username = json['username'];
     password = json['password'];
     token = json['token'];
+    level = json['level'];
   }
 
   Map<String, dynamic> toJson() {
@@ -19,6 +21,7 @@ class User {
     data['username'] = this.username;
     data['password'] = this.password;
     data['token'] = this.token;
+    data['level'] = this.level;
     return data;
   }
 }

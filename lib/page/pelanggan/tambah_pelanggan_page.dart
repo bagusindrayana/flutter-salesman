@@ -29,6 +29,7 @@ class _TambahPelangganPageState extends State<TambahPelangganPage> {
   TextEditingController _tanggalTagihanController = TextEditingController();
   TextEditingController _totalTagihanController = TextEditingController();
   TextEditingController _keteranganController = TextEditingController();
+  bool uangCash = false;
   Tagihan? tagihan;
   GlobalKey _formKey = GlobalKey<FormState>();
   DateTime selectedDate = DateTime.now();
@@ -131,7 +132,8 @@ class _TambahPelangganPageState extends State<TambahPelangganPage> {
                   longitude: currentLatLng!.longitude.toString()),
               _tanggalTagihanController.text,
               _totalTagihanController.text,
-              _keteranganController.text)
+              _keteranganController.text,
+              uangCash)
           .then((value) {
         if (value.status == 200) {
           Navigator.pop(context);
@@ -383,6 +385,30 @@ class _TambahPelangganPageState extends State<TambahPelangganPage> {
                                 labelText: "Total Tagihan",
                                 border: OutlineInputBorder(),
                               ),
+                            ),
+                            SizedBox(
+                              height: 16,
+                            ),
+                            Row(
+                              children: [
+                                Checkbox(
+                                  checkColor: Colors.white,
+                                  value: uangCash,
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      uangCash = uangCash!;
+                                    });
+                                  },
+                                ),
+                                GestureDetector(
+                                  onTap: (() {
+                                    setState(() {
+                                      uangCash = !uangCash;
+                                    });
+                                  }),
+                                  child: Text("Uang Cash"),
+                                )
+                              ],
                             ),
                             SizedBox(
                               height: 16,

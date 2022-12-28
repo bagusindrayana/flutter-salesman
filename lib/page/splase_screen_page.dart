@@ -13,11 +13,12 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
   void checkAuth() async {
     var token = await StorageProvider.getToken();
     if (token == null) {
+      print("token null");
       Navigator.pushReplacementNamed(context, '/login');
     } else {
       await AuthRepository().checkAuth(token).then((res) {
         if (res.status == 200) {
-          Navigator.pushReplacementNamed(context, '/');
+          Navigator.pushReplacementNamed(context, '/home');
         } else {
           Navigator.pushReplacementNamed(context, '/login');
         }

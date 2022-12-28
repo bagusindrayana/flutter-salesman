@@ -75,7 +75,13 @@ class _TagihanPageState extends State<TagihanPage> {
                     var date7String = date7.toString().substring(0, 10);
                     return Card(
                       child: ListTile(
-                        onTap: () {},
+                        onTap: (() {
+                          Navigator.pushNamed(context, "/detail-tagihan",
+                                  arguments: listTagihan[index])
+                              .then((value) {
+                            getTagihan();
+                          });
+                        }),
                         title:
                             Text("${listTagihan[index].pelanggan!.namaUsaha}"),
                         subtitle: Row(
