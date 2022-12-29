@@ -69,6 +69,29 @@ class _DetailTagihanPageState extends State<DetailTagihanPage> {
     Navigator.pop(context);
   }
 
+  void hapusTagihan() async {
+    UtilityProvider.showLoadingDialog(context);
+    var token = await StorageProvider.getToken();
+    if (token == null) {
+      Navigator.of(context).pop();
+      return;
+    } else {
+      await TagihanRepository()
+          .hapusTagihan(token, tagihan!.sId!)
+          .then((value) {
+        if (value.status == 200) {
+          Navigator.of(context).pop();
+
+          UtilityProvider.showSnackBar("${value.message}", context);
+          Navigator.of(context).pop();
+        } else {
+          Navigator.of(context).pop();
+          UtilityProvider.showAlertDialog("Gagal", "${value.message}", context);
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     tagihan = ModalRoute.of(context)!.settings.arguments as Tagihan;
@@ -76,12 +99,43 @@ class _DetailTagihanPageState extends State<DetailTagihanPage> {
     selectedDate = DateTime.parse(tagihan!.tanggalTagihan.toString());
 
     _tanggalTagihanController.text = tagihan!.tanggalTagihan.toString();
-    _totalTagihanController.text = tagihan!.totalTagihan.toString();
+    _totalTagihanController.text = (tagihan!.totalTagihan ?? 0).toString();
     _keteranganController.text = tagihan!.keterangan.toString();
     uangCash = tagihan!.cash ?? false;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Detail Tagihan'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              //alert
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: Text("Hapus Tagihan"),
+                      content: Text(
+                          "Apakah anda yakin ingin menghapus tagihan ini?"),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text("Batal"),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            hapusTagihan();
+                          },
+                          child: Text("Hapus"),
+                        ),
+                      ],
+                    );
+                  });
+            },
+            icon: Icon(Icons.delete),
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: Card(

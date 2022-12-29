@@ -95,7 +95,8 @@ class _HomePageState extends State<HomePage> {
 
   void logout() async {
     await StorageProvider.clearToken();
-    Navigator.pushReplacementNamed(context, '/login');
+    Navigator.pushNamedAndRemoveUntil(
+        context, '/login', (Route<dynamic> route) => false);
   }
 
   @override

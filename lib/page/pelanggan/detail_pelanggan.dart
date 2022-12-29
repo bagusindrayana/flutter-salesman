@@ -208,6 +208,28 @@ class _DetailPelangganPageState extends State<DetailPelangganPage> {
         });
   }
 
+  void hapusPelanggan() async {
+    UtilityProvider.showLoadingDialog(context);
+    var token = await StorageProvider.getToken();
+    if (token == null) {
+      Navigator.of(context).pop();
+      return;
+    } else {
+      await PelangganRepository()
+          .hapusPelanggan(token, pelanggan!.sId!)
+          .then((value) {
+        if (value.status == 200) {
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+          UtilityProvider.showSnackBar("${value.message}", context);
+        } else {
+          Navigator.of(context).pop();
+          UtilityProvider.showAlertDialog("Gagal", "${value.message}", context);
+        }
+      });
+    }
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -240,6 +262,35 @@ class _DetailPelangganPageState extends State<DetailPelangganPage> {
               });
             },
             icon: Icon(Icons.edit),
+          ),
+          IconButton(
+            onPressed: () {
+              //alert
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: Text("Hapus Pelanggan"),
+                      content: Text(
+                          "Apakah anda yakin ingin menghapus pelanggan ini?"),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text("Batal"),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            hapusPelanggan();
+                          },
+                          child: Text("Hapus"),
+                        ),
+                      ],
+                    );
+                  });
+            },
+            icon: Icon(Icons.delete),
           )
         ],
       ),

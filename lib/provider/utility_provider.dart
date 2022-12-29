@@ -60,6 +60,9 @@ class UtilityProvider {
   }
 
   static String formatCurrency(String price) {
+    if (price == "null") {
+      return "Rp. 0";
+    }
     var priceFormat =
         NumberFormat.currency(locale: 'id', symbol: 'Rp. ', decimalDigits: 0)
             .format(int.parse(price));

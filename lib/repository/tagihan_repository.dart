@@ -228,4 +228,33 @@ class TagihanRepository {
       }
     }
   }
+
+  Future<TagihanResponse> hapusTagihan(String token, String tagihan_id) async {
+    try {
+      var url = "/tagihan/${tagihan_id}/delete";
+
+      var response =
+          await ApiProvider.post(url, null, {"Authorization": "Bearer $token"});
+
+      if (response.statusCode == 200) {
+        var d = TagihanResponse.fromJson(response.data);
+        d.status = response.statusCode;
+        return d;
+      } else {
+        return TagihanResponse(status: 500, message: "Gagal menghapus data");
+      }
+    } catch (e, t) {
+      if (e is DioError && e.response != null) {
+        print(e.response!.data);
+        return TagihanResponse(
+            status: e.response!.statusCode,
+            message: "Gagal menghapus data. ${e.message}");
+      } else {
+        print(e);
+        print(t);
+        return TagihanResponse(
+            status: 500, message: "Gagal menghapus data. ${e}");
+      }
+    }
+  }
 }

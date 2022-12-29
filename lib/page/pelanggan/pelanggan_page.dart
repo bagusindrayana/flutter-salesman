@@ -68,11 +68,18 @@ class _PelangganPageState extends State<PelangganPage> {
                     itemBuilder: (context, index) {
                       return Card(
                         child: ListTile(
-                          title: Text(listPelanggan[index].namaUsaha!),
-                          subtitle: Text(listPelanggan[index].alamat!),
+                          title: Text(
+                            listPelanggan[index].namaUsaha!,
+                            style: TextStyle(fontSize: 24),
+                          ),
+                          subtitle: Text(
+                            listPelanggan[index].alamat!,
+                            style: TextStyle(fontSize: 16),
+                          ),
                           onTap: () {
                             Navigator.pushNamed(context, '/detail-pelanggan',
-                                arguments: listPelanggan[index]);
+                                    arguments: listPelanggan[index])
+                                .then((value) => setState(() {}));
                           },
                         ),
                       );
