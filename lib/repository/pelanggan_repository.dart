@@ -311,4 +311,31 @@ class PelangganRepository {
       }
     }
   }
+
+  Future<AllPelangganResponse> getPelangganByKurir(
+      String token, String kurir_id) async {
+    try {
+      var url = "/pelanggan-kurir/${kurir_id}";
+      var response =
+          await ApiProvider.get(url, {"Authorization": "Bearer $token"});
+      if (response.statusCode == 200) {
+        var d = AllPelangganResponse.fromJson(response.data);
+        d.status = response.statusCode;
+        return d;
+      } else {
+        return AllPelangganResponse(
+            status: 500, message: "Gagal mengambil data");
+      }
+    } catch (e, t) {
+      if (e is DioError && e.response != null) {
+        return AllPelangganResponse(
+            status: e.response!.statusCode,
+            message: "Gagal mengambil data. ${e.message}");
+      } else {
+        print(t);
+        return AllPelangganResponse(
+            status: 500, message: "Gagal mengambil data. ${e}");
+      }
+    }
+  }
 }

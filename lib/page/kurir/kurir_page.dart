@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:salesman/model/pelanggan.dart';
+import 'package:salesman/model/user.dart';
 import 'package:salesman/provider/storage_provider.dart';
 import 'package:salesman/provider/utility_provider.dart';
-import 'package:salesman/repository/pelanggan_repository.dart';
+import 'package:salesman/repository/kurir_repository.dart';
 
-class PelangganPage extends StatefulWidget {
-  const PelangganPage({super.key});
+class KurirPage extends StatefulWidget {
+  const KurirPage({super.key});
 
   @override
-  State<PelangganPage> createState() => _PelangganPageState();
+  State<KurirPage> createState() => _KurirPageState();
 }
 
-class _PelangganPageState extends State<PelangganPage> {
-  List<Pelanggan> _listPelanggan = [];
-  List<Pelanggan> listPelanggan = [];
+class _KurirPageState extends State<KurirPage> {
+  List<User> _listKurir = [];
+  List<User> listKurir = [];
   bool search = false;
   //focus node
   FocusNode _searchFocus = FocusNode();
@@ -24,7 +24,7 @@ class _PelangganPageState extends State<PelangganPage> {
     }
   }
 
-  void getPelanggan() async {
+  void getKurir() async {
     UtilityProvider.showLoadingDialog(context);
     var token = await StorageProvider.getToken();
     if (token == null) {
@@ -32,11 +32,11 @@ class _PelangganPageState extends State<PelangganPage> {
       Navigator.pushReplacementNamed(context, '/login');
       return;
     } else {
-      await PelangganRepository().getAllPelanggan(token).then((res) {
+      await KurirRepository().getAllKurir(token).then((res) {
         if (res.status == 200) {
           setState(() {
-            _listPelanggan = res.data!;
-            listPelanggan = res.data!;
+            _listKurir = res.data!;
+            listKurir = res.data!;
           });
         } else if (res.status == 401) {
           Navigator.pushReplacementNamed(context, '/login');
@@ -55,7 +55,7 @@ class _PelangganPageState extends State<PelangganPage> {
     // TODO: implement initState
     super.initState();
     Future.delayed(Duration.zero, () {
-      getPelanggan();
+      getKurir();
     });
   }
 
@@ -64,7 +64,7 @@ class _PelangganPageState extends State<PelangganPage> {
     return Scaffold(
         appBar: AppBar(
           title: (!search)
-              ? Text("Data Pelanggan")
+              ? Text("Data Kurir")
               : Container(
                   height: 40,
                   padding: EdgeInsets.symmetric(horizontal: 10),
@@ -75,17 +75,17 @@ class _PelangganPageState extends State<PelangganPage> {
                     focusNode: _searchFocus,
                     onChanged: (value) {
                       setState(() {
-                        listPelanggan = _listPelanggan
+                        listKurir = _listKurir
                             .where((element) =>
-                                element.namaUsaha!
+                                element.username!
                                     .toLowerCase()
                                     .contains(value) ||
-                                element.alamat!.toLowerCase().contains(value))
+                                element.nama!.toLowerCase().contains(value))
                             .toList();
                       });
                     },
                     decoration: InputDecoration(
-                        border: InputBorder.none, hintText: "Cari Pelanggan"),
+                        border: InputBorder.none, hintText: "Cari Kurir"),
                   ),
                 ),
           actions: [
@@ -103,7 +103,7 @@ class _PelangganPageState extends State<PelangganPage> {
                     onPressed: () {
                       setState(() {
                         search = false;
-                        listPelanggan = _listPelanggan;
+                        listKurir = _listKurir;
                       });
                     },
                     icon: Icon(Icons.close),
@@ -111,24 +111,24 @@ class _PelangganPageState extends State<PelangganPage> {
           ],
         ),
         body: RefreshIndicator(
-            child: (listPelanggan.length > 0)
+            child: (listKurir.length > 0)
                 ? ListView.builder(
-                    itemCount: listPelanggan.length,
+                    itemCount: listKurir.length,
                     itemBuilder: (context, index) {
                       return Card(
                         child: ListTile(
                           title: Text(
-                            listPelanggan[index].namaUsaha!,
+                            listKurir[index].username!,
                             style: TextStyle(fontSize: 24),
                           ),
                           subtitle: Text(
-                            listPelanggan[index].alamat!,
+                            "${listKurir[index].nama}",
                             style: TextStyle(fontSize: 16),
                           ),
                           onTap: () {
-                            Navigator.pushNamed(context, '/detail-pelanggan',
-                                    arguments: listPelanggan[index])
-                                .then((value) => setState(() {}));
+                            Navigator.pushNamed(context, '/detail-kurir',
+                                    arguments: listKurir[index])
+                                .then((value) => getKurir());
                           },
                         ),
                       );
@@ -141,12 +141,12 @@ class _PelangganPageState extends State<PelangganPage> {
                     ),
                   ),
             onRefresh: () async {
-              getPelanggan();
+              getKurir();
             }),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            Navigator.pushNamed(context, '/tambah-pelanggan').then((value) {
-              getPelanggan();
+            Navigator.pushNamed(context, '/tambah-kurir').then((value) {
+              getKurir();
             });
           },
           child: Icon(Icons.add),

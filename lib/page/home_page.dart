@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:salesman/model/pelanggan.dart';
 import 'package:salesman/model/tagihan.dart';
+import 'package:salesman/model/user.dart';
 import 'package:salesman/provider/storage_provider.dart';
 import 'package:salesman/provider/utility_provider.dart';
+import 'package:salesman/repository/auth_repository.dart';
 import 'package:salesman/repository/pelanggan_repository.dart';
 import 'package:salesman/repository/stat_repository.dart';
 import 'package:salesman/repository/tagihan_repository.dart';
@@ -15,6 +17,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  User? user;
   int? total_tagihan = null;
   int? total_pelanggan = null;
   bool loadingTagihan = true;
@@ -27,6 +30,25 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void checkAuth() async {
+    var token = await StorageProvider.getToken();
+
+    if (token == null) {
+      print("token null");
+      Navigator.pushReplacementNamed(context, '/login');
+    } else {
+      await AuthRepository().checkAuth(token).then((res) {
+        print(res.message);
+        if (res.status == 200 && res.user != null) {
+          setState(() {
+            user = res.user;
+          });
+        }
+        getStat();
+      });
+    }
+  }
+
   void getStat() async {
     var token = await StorageProvider.getToken();
     if (token == null) {
@@ -36,7 +58,6 @@ class _HomePageState extends State<HomePage> {
 
     UtilityProvider.showLoadingDialog(context);
     await StatRepository().getStat(token).then((value) {
-      print(value.data);
       if (value.status == 200) {
         setState(() {
           total_tagihan = value.data['total_tagihan'];
@@ -63,7 +84,6 @@ class _HomePageState extends State<HomePage> {
       loadingTagihan = true;
     });
     await PelangganRepository().tagihanPelangganMingguIni(token).then((value) {
-      print(value.data);
       if (value.status == 200) {
         setState(() {
           tagihanMingguIni = value.data!;
@@ -104,7 +124,7 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement initState
     super.initState();
     Future.delayed(Duration.zero, () {
-      getStat();
+      checkAuth();
     });
   }
 
@@ -116,7 +136,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: RefreshIndicator(
           onRefresh: () async {
-            getStat();
+            checkAuth();
           },
           child: Padding(
             padding: EdgeInsets.all(16),
@@ -251,15 +271,24 @@ class _HomePageState extends State<HomePage> {
                               },
                               title: Text(
                                   "${tagihanMingguIni[index]['nama_usaha']}"),
-                              subtitle: Row(
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                      '${UtilityProvider.formatCurrency("${tagihanMingguIni[index]['total_tagihan']}")}'),
-                                  Text("/"),
-                                  Text(
-                                    '${UtilityProvider.formatCurrency("${tagihanMingguIni[index]['total_bayar']}")}',
-                                    style: TextStyle(color: Colors.red),
-                                  )
+                                  Row(
+                                    children: [
+                                      Text(
+                                          '${UtilityProvider.formatCurrency("${tagihanMingguIni[index]['total_tagihan']}")}'),
+                                      Text("/"),
+                                      Text(
+                                        '${UtilityProvider.formatCurrency("${tagihanMingguIni[index]['total_bayar']}")}',
+                                        style: TextStyle(color: Colors.red),
+                                      )
+                                    ],
+                                  ),
+                                  (tagihanMingguIni[index]['user'] != null)
+                                      ? Text(
+                                          "user : ${tagihanMingguIni[index]['user']['nama']}")
+                                      : SizedBox(),
                                 ],
                               ),
                               trailing: Column(
@@ -313,6 +342,15 @@ class _HomePageState extends State<HomePage> {
                 Navigator.pushNamed(context, '/tagihan');
               },
             ),
+            (user != null && user?.level == "admin")
+                ? ListTile(
+                    leading: Icon(Icons.delivery_dining),
+                    title: const Text('Kurir'),
+                    onTap: () {
+                      Navigator.pushNamed(context, '/kurir');
+                    },
+                  )
+                : SizedBox(),
             //logout
             ListTile(
               leading: Icon(Icons.logout),

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:salesman/page/kurir/detail_kurir_page.dart';
+import 'package:salesman/page/kurir/kurir_page.dart';
+import 'package:salesman/page/kurir/tambah_kurir_page.dart';
+import 'package:salesman/page/kurir/ubah_kurir_page.dart';
 import 'package:salesman/page/tagihan/bayar_tagihan_page.dart';
 import 'package:salesman/page/home_page.dart';
 import 'package:salesman/page/login_page.dart';
-import 'package:salesman/page/pelanggan/detail_pelanggan.dart';
+import 'package:salesman/page/pelanggan/detail_pelanggan_page.dart';
 import 'package:salesman/page/pelanggan/pelanggan_page.dart';
 import 'package:salesman/page/pelanggan/tambah_pelanggan_page.dart';
 import 'package:salesman/page/pelanggan/ubah_pelanggan_page.dart';
@@ -34,14 +38,18 @@ class MyApp extends StatelessWidget {
           '/home': (context) => const HomePage(),
           '/pelanggan': (context) => const PelangganPage(),
           '/detail-pelanggan': (context) => const DetailPelangganPage(),
+          '/tambah-pelanggan': (context) => const TambahPelangganPage(),
+          '/ubah-pelanggan': (context) => const UbahPelangganPage(),
           '/tagihan': (context) => const TagihanPage(),
           '/detail-tagihan': (context) => const DetailTagihanPage(),
           '/pilih-lokasi': (context) => const PilihaLokasiPage(),
-          '/tambah-pelanggan': (context) => const TambahPelangganPage(),
-          '/ubah-pelanggan': (context) => const UbahPelangganPage(),
           '/bayar-tagihan': (context) => const BayarTagihanPage(),
           '/tambah-pembayaran': (context) => const TamabahPembayaranPage(),
           '/peta-rute': (context) => const PetaRutePage(),
+          '/kurir': (context) => const KurirPage(),
+          '/tambah-kurir': (context) => const TambahKurirPage(),
+          '/detail-kurir': (context) => const DetailKurirPage(),
+          '/ubah-kurir': (context) => const UbahKurirPage(),
         });
   }
 }

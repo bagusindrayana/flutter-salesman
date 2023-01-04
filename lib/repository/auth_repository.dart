@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:salesman/model/user.dart';
 import 'package:salesman/provider/api_provider.dart';
 
 //make model login response
@@ -9,13 +10,15 @@ class LoginResponse {
   String? token;
   String? message;
   int? status;
+  User? user;
 
-  LoginResponse({this.token, this.message, this.status});
+  LoginResponse({this.token, this.message, this.status, this.user});
 
   LoginResponse.fromJson(Map<String, dynamic> json) {
     token = json['token'];
     message = json['message'];
     status = json['status'] ?? null;
+    user = json['user'] != null ? new User.fromJson(json['user']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -23,6 +26,9 @@ class LoginResponse {
     data['token'] = this.token;
     data['message'] = this.message;
     data['status'] = this.status;
+    if (this.user != null) {
+      data['user'] = this.user!.toJson();
+    }
     return data;
   }
 }
@@ -91,14 +97,15 @@ class AuthRepository {
         return LoginResponse(
             status: 200,
             message: "Login berhasil",
-            token: response.data['data']['token']);
+            token: response.data['data']['token'],
+            user: User.fromJson(response.data['data']));
       }
 
       return LoginResponse(status: 402, message: response.data);
     } catch (e) {
       if (e is DioError) {
         var response = e.response;
-        print(response);
+
         if (response == null) {
           return LoginResponse(message: "Error : ${e}");
         } else if (response.data != null) {
@@ -106,6 +113,7 @@ class AuthRepository {
         }
         return LoginResponse(message: "Error : ${e.message}", status: 500);
       } else {
+        print(e);
         return LoginResponse(message: "Error : Uknown", status: 500);
       }
     }
