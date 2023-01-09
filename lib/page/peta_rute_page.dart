@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:label_marker/label_marker.dart';
+import 'package:salesman/provider/utility_provider.dart';
 
 class PetaRutePage extends StatefulWidget {
   const PetaRutePage({super.key});
@@ -109,6 +111,29 @@ class _PetaRutePageState extends State<PetaRutePage> {
         }
       });
     } catch (e) {
+      UtilityProvider.showSnackBar("${e}", context);
+      var i = 0;
+      for (var pelanggan in listTempat) {
+        markers
+            .addLabelMarker(LabelMarker(
+              onTap: () {
+                setState(() {
+                  namaToko =
+                      "${pelanggan['nama_usaha']} / ${pelanggan['no_telp']}";
+                  address = pelanggan['alamat'];
+                });
+              },
+              label: "${i}",
+              markerId: MarkerId("trip-$i"),
+              position: LatLng(double.parse(pelanggan['latitude']),
+                  double.parse(pelanggan['longitude'])),
+              backgroundColor: Colors.green,
+            ))
+            .then((value) {});
+        i++;
+      }
+
+      setState(() {});
       if (e is DioError) {
         print(e.response);
       } else {

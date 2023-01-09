@@ -68,7 +68,7 @@ class _HomePageState extends State<HomePage> {
       }
     });
     Navigator.pop(context);
-    getTagihanMingguIni();
+    //getTagihanMingguIni();
   }
 
   void getTagihanMingguIni() async {
@@ -136,7 +136,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: RefreshIndicator(
           onRefresh: () async {
-            checkAuth();
+            getStat();
           },
           child: Padding(
             padding: EdgeInsets.all(16),
@@ -204,113 +204,130 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
                 SizedBox(height: 20),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 5),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Tagihan Lewat 6 Hari',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      InkWell(
-                          customBorder: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          onTap: () {
-                            bukaRute();
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: Colors.blue,
-                                borderRadius: BorderRadius.circular(50)),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 8),
-                            child: Text(
-                              "Buka Rute",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ))
-                    ],
-                  ),
-                ),
-                SizedBox(height: 10),
-                (loadingTagihan)
-                    ? Center(
-                        child: SizedBox(
-                          height: 50,
-                          width: 50,
-                          child: CircularProgressIndicator(),
-                        ),
-                      )
-                    : ListView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: tagihanMingguIni.length,
-                        itemBuilder: (context, index) {
-                          var tanggalTagihan = tagihanMingguIni[index]
-                              ['tagihan_terbaru']['tanggal_tagihan'];
-                          //format string to date
-                          var date = DateTime.parse(tanggalTagihan!);
-                          //add 7 days to date
-                          var date7 = date.add(Duration(days: 7));
-                          //get YYYY-MM-DD
-                          var date7String = date7.toString().substring(0, 10);
-                          return Card(
-                            child: ListTile(
-                              onTap: () {
-                                Navigator.pushNamed(
-                                        context, "/tambah-pembayaran",
-                                        arguments: Pelanggan.fromJson(
-                                            tagihanMingguIni[index]))
-                                    .then((_) {
-                                  setState(() {});
-                                  getStat();
-                                });
-                              },
-                              title: Text(
-                                  "${tagihanMingguIni[index]['nama_usaha']}"),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Text(
-                                          '${UtilityProvider.formatCurrency("${tagihanMingguIni[index]['total_tagihan']}")}'),
-                                      Text("/"),
-                                      Text(
-                                        '${UtilityProvider.formatCurrency("${tagihanMingguIni[index]['total_bayar']}")}',
-                                        style: TextStyle(color: Colors.red),
-                                      )
-                                    ],
-                                  ),
-                                  (tagihanMingguIni[index]['user'] != null)
-                                      ? Text(
-                                          "user : ${tagihanMingguIni[index]['user']['nama']}")
-                                      : SizedBox(),
-                                ],
-                              ),
-                              trailing: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                      "${DateTime.parse(tanggalTagihan!).toString().substring(0, 10)}"),
-                                  Container(
-                                    height: 2,
-                                    width: 70,
-                                    color: Colors.black26,
-                                  ),
-                                  Text(
-                                    "${date7String}",
-                                    style: TextStyle(color: Colors.red),
-                                  )
-                                ],
-                              ),
-                            ),
-                          );
-                        })
+                ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/lihat-peta');
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.map),
+                        Text("Lokasi Semua Pelanggan")
+                      ],
+                    ))
+                // Padding(
+                //   padding: EdgeInsets.symmetric(horizontal: 5),
+                //   child: Row(
+                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //     children: [
+                //       Column(
+                //         crossAxisAlignment: CrossAxisAlignment.start,
+                //         children: [
+                //           Text(
+                //             'Tagihan Lewat 6 Hari',
+                //             style: TextStyle(
+                //                 fontSize: 20, fontWeight: FontWeight.bold),
+                //           ),
+                //           Text("Pelanggan (${tagihanMingguIni.length})")
+                //         ],
+                //       ),
+                //       InkWell(
+                //           customBorder: RoundedRectangleBorder(
+                //             borderRadius: BorderRadius.circular(50),
+                //           ),
+                //           onTap: () {
+                //             bukaRute();
+                //           },
+                //           child: Container(
+                //             decoration: BoxDecoration(
+                //                 color: Colors.blue,
+                //                 borderRadius: BorderRadius.circular(50)),
+                //             padding: EdgeInsets.symmetric(
+                //                 horizontal: 12, vertical: 8),
+                //             child: Text(
+                //               "Buka Rute",
+                //               style: TextStyle(color: Colors.white),
+                //             ),
+                //           ))
+                //     ],
+                //   ),
+                // ),
+                // SizedBox(height: 10),
+                // (loadingTagihan)
+                //     ? Center(
+                //         child: SizedBox(
+                //           height: 50,
+                //           width: 50,
+                //           child: CircularProgressIndicator(),
+                //         ),
+                //       )
+                //     : ListView.builder(
+                //         shrinkWrap: true,
+                //         physics: NeverScrollableScrollPhysics(),
+                //         itemCount: tagihanMingguIni.length,
+                //         itemBuilder: (context, index) {
+                //           var tanggalTagihan = tagihanMingguIni[index]
+                //               ['tagihan_terbaru']['tanggal_tagihan'];
+                //           //format string to date
+                //           var date = DateTime.parse(tanggalTagihan!);
+                //           //add 7 days to date
+                //           var date7 = date.add(Duration(days: 7));
+                //           //get YYYY-MM-DD
+                //           var date7String = date7.toString().substring(0, 10);
+                //           return Card(
+                //             child: ListTile(
+                //               onTap: () {
+                //                 Navigator.pushNamed(
+                //                         context, "/tambah-pembayaran",
+                //                         arguments: Pelanggan.fromJson(
+                //                             tagihanMingguIni[index]))
+                //                     .then((_) {
+                //                   setState(() {});
+                //                   getStat();
+                //                 });
+                //               },
+                //               title: Text(
+                //                   "${tagihanMingguIni[index]['nama_usaha']}"),
+                //               subtitle: Column(
+                //                 crossAxisAlignment: CrossAxisAlignment.start,
+                //                 children: [
+                //                   Row(
+                //                     children: [
+                //                       Text(
+                //                           '${UtilityProvider.formatCurrency("${tagihanMingguIni[index]['total_tagihan']}")}'),
+                //                       Text("/"),
+                //                       Text(
+                //                         '${UtilityProvider.formatCurrency("${tagihanMingguIni[index]['total_bayar']}")}',
+                //                         style: TextStyle(color: Colors.red),
+                //                       )
+                //                     ],
+                //                   ),
+                //                   (tagihanMingguIni[index]['user'] != null)
+                //                       ? Text(
+                //                           "user : ${tagihanMingguIni[index]['user']['nama']}")
+                //                       : SizedBox(),
+                //                 ],
+                //               ),
+                //               trailing: Column(
+                //                 mainAxisAlignment: MainAxisAlignment.center,
+                //                 mainAxisSize: MainAxisSize.min,
+                //                 children: [
+                //                   Text(
+                //                       "${DateTime.parse(tanggalTagihan!).toString().substring(0, 10)}"),
+                //                   Container(
+                //                     height: 2,
+                //                     width: 70,
+                //                     color: Colors.black26,
+                //                   ),
+                //                   Text(
+                //                     "${date7String}",
+                //                     style: TextStyle(color: Colors.red),
+                //                   )
+                //                 ],
+                //               ),
+                //             ),
+                //           );
+                //         })
               ],
             ),
           )),

@@ -138,103 +138,123 @@ class _DetailTagihanPageState extends State<DetailTagihanPage> {
         ],
       ),
       body: SingleChildScrollView(
-        child: Card(
-          margin: EdgeInsets.all(16),
-          child: Padding(
-            padding: EdgeInsets.all(8),
-            child: (tagihan != null)
-                ? Column(children: [
-                    SizedBox(
-                      height: 16,
-                    ),
-                    GestureDetector(
-                      onTap: () async {
-                        await _selectDate(context);
-                      },
-                      child: TextFormField(
-                        onTap: () async {
-                          await _selectDate(context);
-                        },
-                        controller: _tanggalTagihanController,
-                        readOnly: true,
-                        //enabled: false,
-                        decoration: InputDecoration(
-                          labelText: "Tanggal Tagihan",
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 16,
-                    ),
-                    TextFormField(
-                      controller: _totalTagihanController,
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        labelText: "Total Tagihan",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 16,
-                    ),
-                    Row(
-                      children: [
-                        Checkbox(
-                          checkColor: Colors.white,
-                          value: uangCash,
-                          onChanged: (bool? value) {
-                            setState(() {
-                              uangCash = uangCash!;
-                            });
-                          },
+        child: Column(
+          children: [
+            Card(
+              margin: EdgeInsets.only(top: 16, left: 16, right: 16),
+              child: Column(
+                children: [
+                  ListTile(
+                    title: Text("Nama Usaha"),
+                    subtitle: Text("${tagihan?.pelanggan?.namaUsaha}"),
+                  ),
+                  ListTile(
+                    title: Text("Alamat"),
+                    subtitle: Text("${tagihan?.pelanggan?.alamat}"),
+                  ),
+                ],
+              ),
+            ),
+            Card(
+              margin: EdgeInsets.all(16),
+              child: Padding(
+                padding: EdgeInsets.all(8),
+                child: (tagihan != null)
+                    ? Column(children: [
+                        SizedBox(
+                          height: 16,
                         ),
                         GestureDetector(
-                          onTap: (() {
-                            setState(() {
-                              uangCash = !uangCash;
-                            });
-                          }),
-                          child: Text("Uang Cash"),
+                          onTap: () async {
+                            await _selectDate(context);
+                          },
+                          child: TextFormField(
+                            onTap: () async {
+                              await _selectDate(context);
+                            },
+                            controller: _tanggalTagihanController,
+                            readOnly: true,
+                            //enabled: false,
+                            decoration: InputDecoration(
+                              labelText: "Tanggal Tagihan",
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 16,
+                        ),
+                        TextFormField(
+                          controller: _totalTagihanController,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: "Total Tagihan",
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 16,
+                        ),
+                        Row(
+                          children: [
+                            Checkbox(
+                              checkColor: Colors.white,
+                              value: uangCash,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  uangCash = uangCash!;
+                                });
+                              },
+                            ),
+                            GestureDetector(
+                              onTap: (() {
+                                setState(() {
+                                  uangCash = !uangCash;
+                                });
+                              }),
+                              child: Text("Uang Cash"),
+                            )
+                          ],
+                        ),
+                        SizedBox(
+                          height: 16,
+                        ),
+                        //multiline TextFormField
+                        TextFormField(
+                          controller: _keteranganController,
+                          maxLines: 5,
+                          decoration: InputDecoration(
+                            labelText: "Keterangan Tambahan",
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Expanded(
+                                child: ElevatedButton(
+                                    onPressed: () {
+                                      updateTagihan();
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.save),
+                                        SizedBox(
+                                          width: 8,
+                                        ),
+                                        Text("Simpan")
+                                      ],
+                                    )))
+                          ],
                         )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 16,
-                    ),
-                    //multiline TextFormField
-                    TextFormField(
-                      controller: _keteranganController,
-                      maxLines: 5,
-                      decoration: InputDecoration(
-                        labelText: "Keterangan Tambahan",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Expanded(
-                            child: ElevatedButton(
-                                onPressed: () {
-                                  updateTagihan();
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.save),
-                                    SizedBox(
-                                      width: 8,
-                                    ),
-                                    Text("Simpan")
-                                  ],
-                                )))
-                      ],
-                    )
-                  ])
-                : Center(child: CircularProgressIndicator()),
-          ),
+                      ])
+                    : Center(child: CircularProgressIndicator()),
+              ),
+            )
+          ],
         ),
       ),
     );

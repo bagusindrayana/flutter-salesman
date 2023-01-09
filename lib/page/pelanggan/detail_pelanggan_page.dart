@@ -330,6 +330,18 @@ class _DetailPelangganPageState extends State<DetailPelangganPage> {
                     ),
                     Card(
                       child: Column(children: [
+                        ElevatedButton(
+                            onPressed: () {
+                              Navigator.pushNamed(context, '/lokasi-pelanggan',
+                                  arguments: pelanggan);
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.map),
+                                Text("Lokasi Pelanggan")
+                              ],
+                            )),
                         Row(
                           children: [
                             Expanded(

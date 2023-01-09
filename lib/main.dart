@@ -3,6 +3,8 @@ import 'package:salesman/page/kurir/detail_kurir_page.dart';
 import 'package:salesman/page/kurir/kurir_page.dart';
 import 'package:salesman/page/kurir/tambah_kurir_page.dart';
 import 'package:salesman/page/kurir/ubah_kurir_page.dart';
+import 'package:salesman/page/lihat_peta.dart';
+import 'package:salesman/page/pelanggan/lokasi_pelanggan.dart';
 import 'package:salesman/page/tagihan/bayar_tagihan_page.dart';
 import 'package:salesman/page/home_page.dart';
 import 'package:salesman/page/login_page.dart';
@@ -40,6 +42,7 @@ class MyApp extends StatelessWidget {
           '/detail-pelanggan': (context) => const DetailPelangganPage(),
           '/tambah-pelanggan': (context) => const TambahPelangganPage(),
           '/ubah-pelanggan': (context) => const UbahPelangganPage(),
+          '/lokasi-pelanggan': (context) => const LokasiPelangganPage(),
           '/tagihan': (context) => const TagihanPage(),
           '/detail-tagihan': (context) => const DetailTagihanPage(),
           '/pilih-lokasi': (context) => const PilihaLokasiPage(),
@@ -50,6 +53,7 @@ class MyApp extends StatelessWidget {
           '/tambah-kurir': (context) => const TambahKurirPage(),
           '/detail-kurir': (context) => const DetailKurirPage(),
           '/ubah-kurir': (context) => const UbahKurirPage(),
+          '/lihat-peta': (context) => const LihatPetaPage(),
         });
   }
 }
